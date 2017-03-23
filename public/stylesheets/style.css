@@ -1,0 +1,65 @@
+body{    
+
+    background-color: #353946!important;
+}
+
+.main-page{
+    padding-top: 35vh;
+    color: white;
+}
+.colwhite{
+    color:white;
+}
+.main-logo{
+    font-size:60px;
+}
+
+.main-btn{
+    border: 2px solid white;
+    color:white;
+    font-size: 20px;
+    background: none;
+    width:150px;
+    height: 60px;
+    margin: 20px;
+    padding-top: 15px;
+}
+
+.login-page{
+    padding-top: 15vh;
+    color: white;
+}
+
+.login-btn{
+    border: 2px solid white;
+    color:white;
+    
+    background: none;
+   
+}
+.colblue
+{
+    color:#42ab9e!important;
+}
+
+.navbar{
+    border-radius: 0px!important;
+}
+
+
+.logout-btn{
+    border: 2px solid #777;
+    color:#777;
+    margin-right: 10px;
+    margin-top:10px;
+    
+    background: none;
+   
+}
+.half-width{
+    width: 50%!important;
+}
+.coldarkblue{
+    color: #353946;
+   
+}

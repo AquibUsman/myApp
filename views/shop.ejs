@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Shop</title>
+    <link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap.min.css"> 
+    <link rel="stylesheet" type="text/css" href="/stylesheets/font-awesome.min.css"><!-- load bootstrap css -->
+	<!-- load fontawesome -->
+	<link rel="stylesheet" type="text/css" href="/stylesheets/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+   
+</head>
+<body class="colwhite">   
+     <% include navigation/nav.ejs %>
+    <div class="container" id="app1" ng-app="addApp" ng-controller="addCtrl">
+            <form ng-submit="submit()">
+                <div class="row">
+                    <div class="col-xs-4 col-xs-offset-4">
+                    
+                        <div class="form-group">
+                        <label for="name">Name</label>
+                         <input class="form-control" type="text" ng-model="data.name" name="text" id="name"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-4 col-xs-offset-4">
+                    
+                        <div class="form-group">
+                        <label for="cat">Catogory</label>
+                         <input class="form-control" type="text" ng-model="data.category" name="text" id="cat"/>
+                        </div>
+                    </div>
+                </div> 
+                 <div class="row">
+                    <div class="col-xs-4 col-xs-offset-4">
+                    
+                        <div class="form-group">
+                        
+                        <input class="login-btn btn btn-default" type="submit" id="submit" value="Add" />
+                        <input class="login-btn btn btn-default" type="button" onclick="window.location.href='/shop'" value="Refresh" />
+                        </div>
+                        <p id="hu"></p>
+                    </div>
+                </div>  
+               
+                
+
+            </form>
+         <hr>
+    </div>
+     
+    
+   
+<div  class="container colwhite" id="app2" ng-app="sortApp" ng-controller="mainController">
+    <div id="login">
+        <div class="">
+              
+                    
+                    <form role="form" class="" method="post">
+                    <div class="row">
+                      <div class="col-xs-4 col-xs-offset-4">  
+                        <div class="form-group">
+                            <label for="cat">Search here.</label>
+                           <input type="text" class="form-control" placeholder="Search..." ng-model="searchMed" autofocus="yes" required="required">
+                           
+                          </div>
+                        </div>
+                        </div>
+                    </form>
+                    <br>
+                <table class="table">
+                    <thead>
+                    <tr bgcolor='white' >
+                        <td>
+                            <a style="color:#353946;font-weight:bolder;" href="#" ng-click="sortType = 'name'; sortReverse = !sortReverse">
+                                NAME
+                                <span ng-show="sortType == 'name' && !sortReverse" class="fa-caret-down"></span>
+                                <span ng-show="sortType == 'name' && sortReverse" class="fa-caret-up"></span>
+                            </a>
+                        </td>
+                        <td>
+                            <a style="color:#353946;font-weight:bolder;" href="#" ng-click="sortType = 'category'; sortReverse = !sortReverse">
+                                CATEGORY
+                                <span ng-show="sortType == 'category' && !sortReverse" class="fa-caret-down"></span>
+                                <span ng-show="sortType == 'category' && sortReverse" class="fa-caret-up"></span>
+                            </a>
+                        </td>
+                        <td style="color:#353946;font-weight:bolder;">ACTIONS</td>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr ng-repeat="roll in row | orderBy:sortType:sortReverse | filter:searchMed" ng-include="loadTemplate(roll)"></tr>
+                    </tbody>
+
+                </table>
+                    <script type="text/ng-template" id="view">
+                        <tr>     <td>{{roll.name}}</td><td>{{roll.category}}</td>
+                            <td>
+                                <input type="button" class="login-btn btn btn-default btn-sm" ng-click="editContent(roll)" value="Edit">
+                                <input type="button" class="login-btn btn btn-default btn-sm" ng-click="removeRow(roll.name)" value="Remove">
+                            </td>
+                        </tr>
+                    </script>
+                    <script type="text/ng-template" id="edit">
+                        <tr>
+                            <td> <input class="half-width form-control coldarkblue" type="text" ng-model="editablerow.name" /></td>
+                            <td> <input class="half-width form-control coldarkblue" type="text" ng-model="editablerow.category" /></td>
+                            <td>
+                                <input type="button" class="login-btn btn  btn-default btn-sm" ng-click="saveData(roll.name,roll.category)" value="Save">
+                                <input type="button" class="login-btn btn  btn-default btn-sm" ng-click="reset()" value="Cancel">
+                            </td>
+                        </tr>
+                    </script>
+                
+        </div>
+    </div>
+</div>
+     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.9/angular.min.js"></script>
+        <script> 
+            var app = angular.module('addApp', [])
+    app.controller('addCtrl', function($scope,$http) {
+        $scope.data = {};
+        $scope.resp = {};
+        $scope.submit = function () {
+            if ($scope.data.name != null && $scope.data.category != null) {
+                $http({
+                    url: '/additem',
+                    method: 'POST',
+                    data: $scope.data
+                }).then(function (resp) {
+                    if (resp.data=="error"){
+
+                        window.alert("Item Already Exists");
+                        document.getElementById("name").value="";
+                        document.getElementById("cat").value="";
+                    }
+                    else
+                        document.getElementById("hu").innerHTML = resp.data;
+                })
+            }
+            else
+                window.alert("Enter details!!");
+        }
+    });
+    var sortModule=angular.module('sortApp', [])
+            sortModule.controller('mainController', function($scope,$http) {
+                $scope.editablerow = [];
+                $scope.sortType     = 'name'; // set the default sort type
+                $scope.sortReverse  = false;  // set the default sort order
+                $scope.searchMed   = '';     // set the default search/filter term
+                function htmlDecode(input){
+                    var e = document.createElement('div');
+                    e.innerHTML = input;
+                    return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
+                }
+                $scope.data = {};
+                $scope.row = JSON.parse(htmlDecode("<%= JSON.stringify(data) %>"));
+                $scope.editContent = function(content) {
+                    $scope.editablerow = angular.copy(content);
+
+                }
+                $scope.loadTemplate = function(name) {
+                    if(name.name===$scope.editablerow.name)
+                        return 'edit';
+                    else
+                        return 'view';
+                }
+                $scope.saveData = function (name,cat) {
+                    var index = -1;
+                    var comArr = eval($scope.row);
+                    for (var i = 0; i < comArr.length; i++) {
+                        if (comArr[i].name === name) {
+                            index = i;
+                            break;
+                        }
+                    }
+                    if (index === -1) {
+                        alert("Something gone wrong");
+                    }
+                    else {
+                        $scope.row[index] = angular.copy($scope.editablerow);
+                    }
+                    if (name===$scope.editablerow.name && cat=== $scope.editablerow.category)
+                        $scope.reset();
+                    else {
+                        $scope.data = $scope.editablerow;
+                        $scope.data.f = 1;
+                        $http({
+                            url: '/shop',
+                            method: 'POST',
+                            data: $scope.data
+                        }).then(function (resp) {
+                            if (resp == "error")
+                                alert("can edit only one value at a time");
+                        });
+                        $scope.reset();
+                    }
+                };
+                $scope.reset = function(){
+                    $scope.editablerow = [];
+                }
+                $scope.removeRow = function(name){
+                    if (confirm("Deleting the Item from Storage?")) {
+                        $scope.data.name=name;
+                        $scope.data.f=2;
+                        $http({
+                            url: '/shop',
+                            method: 'POST',
+                            data: $scope.data
+                        });
+
+                        var index = -1;
+                        var comArr = eval($scope.row);
+                        for (var i = 0; i < comArr.length; i++) {
+                            if (comArr[i].name === name) {
+                                index = i;
+                                break;
+                            }
+                        }
+                        if (index === -1) {
+                            alert("Something gone wrong");
+                        }
+                        else
+                        {
+                            $scope.row.splice(index, 1);
+                            alert("Item Deleted");}
+
+                    }
+                };
+            });
+    angular.bootstrap(document.getElementById("app2"), ['sortApp']);
+</script>
+</body>
+
+</html>
