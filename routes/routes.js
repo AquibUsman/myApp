@@ -3,6 +3,7 @@ var mysql = require("sqlite3").verbose();
 var path = require('path')
 var file = path.resolve(__dirname, 'test.db')
 var db = new mysql.Database(file); 
+console.log(path);
 module.exports = function(app, passport) {
 
     // =====================================
